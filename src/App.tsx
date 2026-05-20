@@ -171,19 +171,23 @@ export default function App() {
               <div className="bg-[#FFD500] px-6 py-3 font-black uppercase text-sm tracking-wider border-b-4 border-black">
                 After — EZ Read Pro Version
               </div>
-              <div className="p-6 bg-white space-y-4">
+              <div className="bg-white">
                 {[
-                  { emoji: "🏥", bold: "You have a hospital appointment.", detail: "" },
-                  { emoji: "📅", bold: "When:", detail: "Tuesday 3rd June at 2:30pm" },
-                  { emoji: "📍", bold: "Where:", detail: "St George's Hospital, Level 3, Block C" },
-                  { emoji: "👨‍⚕️", bold: "You will see:", detail: "Dr Ahmed" },
-                  { emoji: "📋", bold: "Bring with you:", detail: "This letter and your medicines list" },
-                  { emoji: "⏰", bold: "Arrive:", detail: "15 minutes early" },
-                  { emoji: "📞", bold: "To cancel, call:", detail: "020 8672 1255" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fdoctor_1a.svg?alt=media", text: "You have a doctor's appointment." },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fwhen.svg?alt=media", text: "When: Tuesday 3rd June at 2:30pm" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fsurgery_health_centre.svg?alt=media", text: "Where: St George's Hospital, Level 3, Block C" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fdoctor_1b.svg?alt=media", text: "You will see: Dr Ahmed" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fletter.svg?alt=media", text: "Bring with you: This letter and your medicines list" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Fwhen.svg?alt=media", text: "Arrive: 15 minutes early" },
+                  { sym: "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2Ftelephone_mobile_2_%2C_to.svg?alt=media", text: "To cancel, call: 020 8672 1255" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 border-2 border-black p-3 bg-[#F4F4F0]">
-                    <span className="text-2xl">{item.emoji}</span>
-                    <p className="font-medium"><strong>{item.bold}</strong> {item.detail}</p>
+                  <div key={i} className="grid grid-cols-[80px_1fr] border-b-2 border-black last:border-b-0">
+                    <div className="border-r-2 border-black p-3 flex items-center justify-center bg-[#F4F4F0]">
+                      <img src={item.sym} alt="" className="w-14 h-14 object-contain" />
+                    </div>
+                    <div className="p-4 flex items-center">
+                      <p className="font-medium text-sm leading-snug">{item.text}</p>
+                    </div>
                   </div>
                 ))}
               </div>
