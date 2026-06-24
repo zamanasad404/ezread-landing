@@ -122,6 +122,24 @@ export default function App() {
         </p>
       </div>
 
+      {/* FREE TEMPLATES NOTICE */}
+      <div className="border-b-4 border-black bg-[#00E5FF] px-6 py-4">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <BookOpen className="h-6 w-6 shrink-0 stroke-[2.5]" />
+            <p className="font-black uppercase tracking-wide text-sm">
+              Looking for free easy read templates? We have ready-made templates for daily life situations — no subscription needed to browse.
+            </p>
+          </div>
+          <a
+            href="#free-templates"
+            className="shrink-0 border-4 border-black bg-black text-[#00E5FF] px-5 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] transition-all whitespace-nowrap"
+          >
+            See Free Templates ↓
+          </a>
+        </div>
+      </div>
+
       {/* HERO */}
       <header className="border-b-4 border-black bg-[#FFD500] px-6 py-20 md:py-28">
         <div className="mx-auto max-w-5xl">
@@ -244,7 +262,7 @@ export default function App() {
       </section>
 
       {/* TEMPLATES */}
-      <section className="border-b-4 border-black bg-white px-6 py-24">
+      <section id="free-templates" className="border-b-4 border-black bg-white px-6 py-24">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-4xl font-black uppercase md:text-5xl">Templates built for daily life</h2>
           <p className="mt-4 text-xl font-medium max-w-3xl border-l-8 border-black pl-6">
