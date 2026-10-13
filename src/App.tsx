@@ -1,647 +1,353 @@
-import React, { useState } from 'react';
-import {
-  ArrowRight,
-  CheckSquare,
-  Clock,
-  FileText,
-  ShieldCheck,
-  Star,
-  X,
-  Menu,
-  Heart,
-  ChevronDown,
-  ChevronUp,
-  Play,
-  Smile,
-  Shield,
-  BookOpen,
-  Phone,
-  Pill,
-  Home,
-  AlertCircle,
-  Users,
-  Wallet
-} from 'lucide-react';
+import React, { useState } from "react";
 
 const REGISTER_URL = "https://app.ezread.co.uk?register=individual";
-const APP_URL = "https://app.ezread.co.uk";
+const APP_URL = "https://app.ezread.co.uk?demo=individual";
 const SYM = "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2F";
 
-const StarRating = () => (
-  <div className="flex gap-1">
-    {[...Array(5)].map((_, i) => (
-      <Star key={i} className="h-5 w-5 fill-[#FFD500] text-[#FFD500]" />
-    ))}
-  </div>
+const templates = [
+  { sym: "morning.svg", title: "Morning Routine", desc: "A step-by-step guide to getting up, washed and dressed. Reduces arguments and makes mornings calmer." },
+  { sym: "tablets.svg", title: "Taking Medication", desc: "Clear visual instructions showing what each tablet looks like, when to take it, and how many." },
+  { sym: "doctor_1a.svg", title: "Hospital Appointment", desc: "Turn any NHS letter into a simple visual guide — when, where, who they will see, what to bring." },
+  { sym: "happy_lady.svg", title: "How I Feel Today", desc: "A simple emotions chart so the person you care for can show you how they are feeling." },
+  { sym: "bed_time.svg", title: "Bedtime Routine", desc: "A calming visual guide to the end-of-day routine — washing, brushing teeth, getting ready for bed." },
+  { sym: "worried_lady.svg", title: "When I Feel Anxious", desc: "Helps them recognise anxiety and know what to do — breathe, tell someone, take a break." },
+  { sym: "shop.svg", title: "Going to the Shops", desc: "Step-by-step guide for an independent trip — what to buy, how to pay, when to come home." },
+  { sym: "money.svg", title: "Understanding Money", desc: "Simple visual guide to budgeting, paying for things, and keeping track of spending." },
+  { sym: "safety_goggles.svg", title: "Staying Safe at Home", desc: "Visual safety reminders for locking doors, not opening to strangers, and what to do in an emergency." },
+];
+
+const faqs = [
+  { q: "Do I need any tech skills?", a: "None at all. If you can send a text message, you can use EZ Read Pro. Open a template, type your details, tap export. That is it." },
+  { q: "Can I try it before subscribing?", a: "Yes — tap Try Free Demo below to explore every template and the full symbol library with no account needed." },
+  { q: "What templates are included?", a: "All 35+ daily life templates — morning and bedtime routines, medication reminders, appointment guides, emotion charts, safety guides, social situations, money basics and more." },
+  { q: "Is this only for people with learning disabilities?", a: "No. The templates work for anyone who benefits from clear visual communication — including people with dementia, brain injuries, low literacy, autism, or anyone who finds standard written information hard to follow." },
+  { q: "How do I cancel?", a: "Log in to your Stripe account and cancel in one click. No phone calls, no forms, no notice period." },
+  { q: "Is my payment secure?", a: "All payments are handled by Stripe. We never see or store your card details." },
+];
+
+const Tick = () => (
+  <svg className="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+  </svg>
 );
 
 const FAQItem = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-6 text-left font-black uppercase text-lg gap-4"
-      >
-        <span>{q}</span>
-        {open ? <ChevronUp className="h-6 w-6 shrink-0" /> : <ChevronDown className="h-6 w-6 shrink-0" />}
+    <div className="border border-stone-200 rounded-2xl overflow-hidden">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-5 py-4 text-left bg-white gap-3">
+        <span className="font-semibold text-stone-800 text-base leading-snug">{q}</span>
+        <svg className="w-5 h-5 text-stone-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d={open ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+        </svg>
       </button>
-      {open && (
-        <div className="px-6 pb-6 font-medium text-gray-700 border-t-4 border-black pt-4">
-          {a}
-        </div>
-      )}
+      {open && <div className="px-5 pb-5 text-stone-600 text-sm leading-relaxed bg-white border-t border-stone-100">{a}</div>}
     </div>
   );
 };
 
-const TemplateCard = ({ icon, color, title, desc, symbol }: { icon: React.ReactNode; color: string; title: string; desc: string; symbol: string }) => (
-  <div className={`border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${color} p-6`}>
-    <div className="flex items-center gap-4 mb-4">
-      <div className="w-16 h-16 border-4 border-black bg-white flex items-center justify-center flex-shrink-0">
-        <img src={`${SYM}${symbol}?alt=media`} alt="" className="w-12 h-12 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
-      </div>
-      <h3 className="text-xl font-black uppercase leading-tight">{title}</h3>
+const SymCard = ({ sym, title, desc }: { sym: string; title: string; desc: string }) => (
+  <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 flex gap-4 items-start">
+    <div className="w-14 h-14 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
+      <img src={`${SYM}${sym}?alt=media`} alt={title} className="w-10 h-10 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
     </div>
-    <p className="font-medium text-gray-800 text-sm leading-relaxed">{desc}</p>
+    <div>
+      <h3 className="font-bold text-stone-800 text-base mb-1">{title}</h3>
+      <p className="text-stone-500 text-sm leading-relaxed">{desc}</p>
+    </div>
   </div>
 );
 
 export default function App() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-[#F4F4F0] font-sans text-black selection:bg-[#FFD500]">
+    <div className="min-h-screen bg-stone-50 font-sans text-stone-800">
 
-      {/* STICKY NAV */}
-      <nav className="sticky top-0 z-50 border-b-4 border-black bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-white border-b border-stone-100 shadow-sm">
+        <div className="max-w-xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center border-4 border-black bg-[#FFD500] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <FileText className="h-6 w-6 stroke-[3]" />
+            <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
-            <span className="text-2xl font-black uppercase tracking-tight">EZ Read Pro</span>
+            <span className="font-bold text-stone-800 text-lg">EZ Read Pro</span>
           </div>
-          <div className="hidden md:flex md:items-center md:gap-6">
-            <a href="#templates" className="font-bold hover:underline">Templates</a>
-            <a href="#how-it-works" className="font-bold hover:underline">How It Works</a>
-            <a href="#pricing" className="font-bold hover:underline">Pricing</a>
-            <a href="#faq" className="font-bold hover:underline">FAQ</a>
-            <a href={APP_URL} className="font-bold hover:underline">Try Demo</a>
-            
-              <a
-              href={REGISTER_URL}
-              className="border-4 border-black bg-[#FFD500] px-6 py-2.5 font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-            >
-              Get Access — £14.99/mo
-            </a>
+          <div className="flex items-center gap-3">
+            <a href={APP_URL} className="text-sm font-medium text-stone-500 hidden sm:block">Try Demo</a>
+            <a href={REGISTER_URL} className="bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">Get Access</a>
           </div>
-          <button
-            className="md:hidden p-2 border-2 border-black"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-4 border-t-4 border-black pt-4 flex flex-col gap-4">
-            <a href="#templates" className="font-bold" onClick={() => setMobileMenuOpen(false)}>Templates</a>
-            <a href="#how-it-works" className="font-bold" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
-            <a href="#pricing" className="font-bold" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
-            <a href="#faq" className="font-bold" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-            <a href={APP_URL} className="font-bold" onClick={() => setMobileMenuOpen(false)}>Try Demo Free</a>
-            <a href={REGISTER_URL} className="border-4 border-black bg-[#FFD500] px-6 py-3 font-black uppercase text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              Get Access — £14.99/mo
-            </a>
-          </div>
-        )}
       </nav>
 
-      {/* URGENCY BANNER */}
-      <div className="bg-black text-white py-3 text-center px-4">
-        <p className="font-bold uppercase tracking-wider text-sm">
-          35+ ready-made guides for carers and families — £14.99/month, cancel anytime
-        </p>
-      </div>
-
-      {/* HERO */}
-      <header className="border-b-4 border-black bg-[#FFD500] px-6 py-16 md:py-24">
-        <div className="mx-auto max-w-5xl">
-          <div className="inline-block border-4 border-black bg-black text-white px-4 py-2 text-sm font-black uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,213,0,1)] mb-6">
-            For parents, family carers and support workers
+      <section className="bg-gradient-to-b from-amber-50 to-stone-50 px-5 pt-12 pb-16">
+        <div className="max-w-xl mx-auto">
+          <div className="flex flex-wrap gap-2 mb-6">
+            {["👩 Parents", "👴 Family carers", "🤝 Support workers"].map((tag, i) => (
+              <span key={i} className="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-sm font-medium text-stone-600 shadow-sm">{tag}</span>
+            ))}
           </div>
-          <h1 className="text-5xl font-black leading-[1.1] tracking-tight md:text-7xl">
-            EVERYTHING YOU NEED TO COMMUNICATE CLEARLY — ALREADY MADE FOR YOU.
+          <h1 className="text-4xl font-bold leading-tight text-stone-900 mb-5">
+            Everything you need to help them understand — already made for you.
           </h1>
-          <p className="mt-8 text-xl font-medium leading-relaxed max-w-3xl border-l-8 border-black pl-6">
-            35+ ready-made guides for every situation you face as a carer — morning routines, medication reminders, appointment letters, emotion guides and more. Open a template, add your details, done in minutes. No starting from scratch. No design skills needed.
+          <p className="text-lg text-stone-600 leading-relaxed mb-8">
+            35+ ready-made guides for every situation you face as a carer. Morning routines, medication reminders, hospital appointments and more. Open a template, add your details, done in minutes.
           </p>
-
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            
-              <a
-              href={REGISTER_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-black text-[#FFD500] px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] transition-all"
-            >
-              Get Access — £14.99/month <ArrowRight className="ml-3 h-6 w-6 stroke-[3]" />
+          <div className="flex flex-col gap-3 mb-8">
+            <a href={REGISTER_URL} className="w-full bg-amber-400 hover:bg-amber-500 text-white font-bold text-lg py-4 rounded-2xl text-center transition-colors shadow-sm block">
+              Get Access — £14.99/month
             </a>
-            
-              <a
-              href={APP_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-white px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all gap-3"
-            >
-              <Play className="h-6 w-6" /> Try Free Demo First
+            <a href={APP_URL} className="w-full bg-white hover:bg-stone-50 text-stone-700 font-semibold text-lg py-4 rounded-2xl text-center transition-colors border border-stone-200 shadow-sm block">
+              Try Free Demo First
             </a>
           </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-6 font-bold text-sm">
-            <span className="flex items-center gap-2"><CheckSquare className="h-5 w-5" /> No starting from scratch</span>
-            <span className="flex items-center gap-2"><CheckSquare className="h-5 w-5" /> Works on your phone</span>
-            <span className="flex items-center gap-2"><CheckSquare className="h-5 w-5" /> Cancel anytime</span>
-            <span className="flex items-center gap-2"><CheckSquare className="h-5 w-5" /> Instant access</span>
+          <div className="flex flex-col gap-2">
+            {["No starting from scratch — templates already built", "Works on your phone", "Cancel anytime — no commitment"].map((t, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Tick />
+                <span className="text-stone-600 text-sm">{t}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* EMOTIONAL HOOK */}
-      <section className="border-b-4 border-black bg-white px-6 py-16">
-        <div className="mx-auto max-w-4xl">
-          <div className="border-l-8 border-[#FFD500] pl-8">
-            <p className="text-2xl md:text-3xl font-black leading-relaxed text-gray-900">
-              "You already do everything you can for the person you care for. This makes one part of it easier — the part where you need them to actually understand."
+      <section className="px-5 py-12 bg-white">
+        <div className="max-w-xl mx-auto">
+          <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100 mb-8">
+            <p className="text-stone-700 text-lg leading-relaxed font-medium">
+              "You already do everything you can for the person you care for. This makes one part of it easier."
             </p>
           </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <h2 className="text-2xl font-bold text-stone-900 mb-5">Does this sound familiar?</h2>
+          <div className="flex flex-col gap-4">
             {[
-              { icon: <AlertCircle className="h-8 w-8" />, text: "They got a letter from the hospital but couldn't understand a word of it" },
-              { icon: <Clock className="h-8 w-8" />, text: "The morning routine takes twice as long because nothing is written down clearly" },
-              { icon: <Pill className="h-8 w-8" />, text: "Medication is confusing and you worry they might take the wrong dose" },
+              { emoji: "📬", text: "They came home with an NHS letter they could not understand at all" },
+              { emoji: "⏰", text: "The morning routine takes twice as long because nothing is written down clearly" },
+              { emoji: "💊", text: "You worry about medication because the instructions are confusing" },
             ].map((item, i) => (
-              <div key={i} className="border-4 border-black p-6 bg-[#F4F4F0] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="mb-3 text-gray-700">{item.icon}</div>
-                <p className="font-bold text-lg leading-snug">{item.text}</p>
+              <div key={i} className="flex items-start gap-4 bg-stone-50 rounded-2xl p-4 border border-stone-100">
+                <span className="text-2xl">{item.emoji}</span>
+                <p className="text-stone-700 font-medium leading-snug">{item.text}</p>
               </div>
             ))}
           </div>
-          <p className="mt-8 text-xl font-bold text-center">EZ Read Pro has a ready-made guide for all of these — and 32 more.</p>
+          <p className="mt-6 text-stone-600 text-base text-center font-medium">EZ Read Pro has a ready-made guide for all of these — and 32 more.</p>
         </div>
       </section>
 
-      {/* TEMPLATE LIBRARY */}
-      <section id="templates" className="border-b-4 border-black bg-[#F4F4F0] px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-4 inline-block border-4 border-black bg-[#FFD500] px-4 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            The template library
-          </div>
-          <h2 className="text-4xl font-black uppercase md:text-5xl max-w-3xl">
-            35+ guides already made. Open, personalise, use.
-          </h2>
-          <p className="mt-4 text-xl font-medium max-w-3xl">
-            Every template uses specialist Mulberry Symbols — the same symbols used by speech and language therapists across the UK. Just add your details and it's ready.
-          </p>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <TemplateCard
-              icon={<Clock />}
-              color="bg-[#00E5FF]"
-              title="Morning Routine"
-              desc="A step-by-step visual guide to getting up, washed and dressed. Reduces arguments and makes mornings calmer for everyone."
-              symbol="morning.svg"
-            />
-            <TemplateCard
-              icon={<Pill />}
-              color="bg-[#FF90E8]"
-              title="Taking Medication"
-              desc="Clear visual instructions for when to take medication, how much, and what it looks like. Reduces confusion and missed doses."
-              symbol="tablets.svg"
-            />
-            <TemplateCard
-              icon={<FileText />}
-              color="bg-[#FFD500]"
-              title="Hospital Appointment"
-              desc="Turn any NHS appointment letter into a clear, visual guide — when, where, who they'll see, and what to bring."
-              symbol="doctor_1a.svg"
-            />
-            <TemplateCard
-              icon={<Smile />}
-              color="bg-[#F4F4F0]"
-              title="How I Feel Today"
-              desc="A simple emotions guide that helps the person you care for tell you how they're feeling without needing to find the words."
-              symbol="happy_lady.svg"
-            />
-            <TemplateCard
-              icon={<Shield />}
-              color="bg-[#00E5FF]"
-              title="Staying Safe at Home"
-              desc="Visual safety reminders for locking doors, not opening to strangers, and what to do in an emergency."
-              symbol="safety_goggles.svg"
-            />
-            <TemplateCard
-              icon={<Heart />}
-              color="bg-[#FF90E8]"
-              title="Bedtime Routine"
-              desc="A calming visual guide to the end-of-day routine — washing, brushing teeth, getting ready for bed."
-              symbol="bed_time.svg"
-            />
-            <TemplateCard
-              icon={<Users />}
-              color="bg-[#FFD500]"
-              title="Going to the Shops"
-              desc="Step-by-step guide for an independent trip to the shops — what to buy, how to pay, when to come home."
-              symbol="shop.svg"
-            />
-            <TemplateCard
-              icon={<AlertCircle />}
-              color="bg-[#F4F4F0]"
-              title="When I Feel Anxious"
-              desc="A guide that helps them recognise anxiety and know what to do — breathe, tell someone, take a break."
-              symbol="worried_lady.svg"
-            />
-            <TemplateCard
-              icon={<Wallet />}
-              color="bg-[#00E5FF]"
-              title="Understanding My Money"
-              desc="Simple visual guide to budgeting, paying for things, and keeping track of spending."
-              symbol="money.svg"
-            />
-          </div>
-
-          <div className="mt-8 border-4 border-black bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <p className="font-black text-lg text-center">Plus 26 more templates covering: personal hygiene, fire safety, online safety, friendships, relationships, public transport, restaurants, asking for help, saying no, and more.</p>
-          </div>
-
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            
-              <a
-              href={REGISTER_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-[#FFD500] px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all"
-            >
-              Get Access to All 35+ Templates <ArrowRight className="ml-3 h-6 w-6 stroke-[3]" />
-            </a>
-            
-              <a
-              href={APP_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-white px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all gap-2"
-            >
-              <Play className="h-5 w-5" /> Try the demo free
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* BEFORE AND AFTER */}
-      <section className="border-b-4 border-black bg-white px-6 py-20">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-4xl font-black uppercase md:text-5xl text-center mb-4">See what it does</h2>
-          <p className="text-center text-xl font-medium mb-16">Take any confusing letter or document — turn it into something they can actually read. In minutes.</p>
-
-          <div className="grid md:grid-cols-2 gap-0 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="border-b-4 md:border-b-0 md:border-r-4 border-black">
-              <div className="bg-black text-white px-6 py-3 font-black uppercase text-sm tracking-wider">
-                Before — NHS Appointment Letter
-              </div>
-              <div className="p-6 bg-gray-50 font-mono text-sm text-gray-600 leading-relaxed">
-                <p className="font-bold text-gray-800 mb-3">Dear Patient,</p>
-                <p className="mb-3">You have been referred to the Outpatient Department at St George's Hospital for a consultation with Dr Ahmed, Consultant Neurologist, regarding your recent MRI findings and ongoing symptomatology.</p>
-                <p className="mb-3">Please attend the Neurology Outpatient Clinic, Level 3, Block C on <strong>Tuesday 3rd June 2026 at 14:30</strong>. Please bring this letter, your medication list and arrive 15 minutes prior to your appointment time.</p>
-                <p className="mb-3">Should you need to cancel or rearrange, please contact the outpatient booking team on 020 8672 1255 ext 4421 with no less than 48 hours notice.</p>
-                <p className="text-xs text-gray-400 mt-4">NHS Trust Reference: STG/NEURO/2026/04421</p>
-              </div>
-            </div>
-            <div>
-              <div className="bg-[#FFD500] px-6 py-3 font-black uppercase text-sm tracking-wider border-b-4 border-black">
-                After — EZ Read Pro Version
-              </div>
-              <div className="bg-white">
-                {[
-                  { sym: "doctor_1a.svg", text: "You have a doctor's appointment." },
-                  { sym: "when.svg", text: "When: Tuesday 3rd June at 2:30pm" },
-                  { sym: "surgery_health_centre.svg", text: "Where: St George's Hospital, Level 3, Block C" },
-                  { sym: "doctor_1b.svg", text: "You will see: Dr Ahmed" },
-                  { sym: "letter.svg", text: "Bring with you: This letter and your medicines list" },
-                  { sym: "when.svg", text: "Arrive: 15 minutes early" },
-                  { sym: "telephone_mobile_2_%2C_to.svg", text: "To cancel, call: 020 8672 1255" },
-                ].map((item, i) => (
-                  <div key={i} className="grid grid-cols-[80px_1fr] border-b-2 border-black last:border-b-0">
-                    <div className="border-r-2 border-black p-3 flex items-center justify-center bg-[#F4F4F0]">
-                      <img src={`${SYM}${item.sym}?alt=media`} alt="" className="w-14 h-14 object-contain" />
-                    </div>
-                    <div className="p-4 flex items-center">
-                      <p className="font-medium text-sm leading-snug">{item.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      <section className="px-5 py-12 bg-stone-50">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">See the difference</h2>
+          <p className="text-stone-500 mb-8">This is what EZ Read Pro does — in under 5 minutes.</p>
+          <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-sm mb-4">
+            <div className="bg-stone-700 text-white px-4 py-3 text-xs font-bold uppercase tracking-wider">Before — NHS Appointment Letter</div>
+            <div className="bg-white p-4 font-mono text-xs text-stone-500 leading-relaxed">
+              <p className="font-bold text-stone-700 mb-2">Dear Patient,</p>
+              <p className="mb-2">You have been referred to the Outpatient Department at St Georges Hospital for a consultation with Dr Ahmed, Consultant Neurologist, regarding your recent MRI findings and ongoing symptomatology.</p>
+              <p className="mb-2">Please attend the Neurology Outpatient Clinic, Level 3, Block C on Tuesday 3rd June 2026 at 14:30. Please bring this letter and arrive 15 minutes prior.</p>
+              <p className="text-stone-400 text-xs mt-2">NHS Trust Reference: STG/NEURO/2026/04421</p>
             </div>
           </div>
-
-          <div className="mt-10 text-center">
-            
-              <a
-              href={REGISTER_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-[#FFD500] px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all"
-            >
-              Get Access — £14.99/month <ArrowRight className="ml-3 h-6 w-6 stroke-[3]" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="border-b-4 border-black bg-[#F4F4F0] px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-center text-4xl font-black uppercase md:text-5xl">How it works</h2>
-          <p className="text-center mt-4 text-xl font-medium">Three steps. No training. No fuss.</p>
-
-          <div className="mt-16 overflow-hidden border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] border-b-4 border-black">
-              <div className="flex items-center justify-center border-r-4 border-black p-4 md:p-8 bg-[#00E5FF]">
-                <span className="text-5xl font-black">1</span>
-              </div>
-              <div className="p-6 md:p-10">
-                <h3 className="text-2xl font-black uppercase md:text-3xl">Open a template that fits your situation</h3>
-                <p className="mt-3 text-lg font-medium text-gray-700">Browse 35+ guides organised by category — daily routines, health, emotions, safety, social situations and more. Find the one you need in seconds.</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] border-b-4 border-black">
-              <div className="flex items-center justify-center border-r-4 border-black p-4 md:p-8 bg-[#FF90E8]">
-                <span className="text-5xl font-black">2</span>
-              </div>
-              <div className="p-6 md:p-10">
-                <h3 className="text-2xl font-black uppercase md:text-3xl">Add your details and choose symbols</h3>
-                <p className="mt-3 text-lg font-medium text-gray-700">Type your specific information — names, times, places. Search 3,400+ specialist Mulberry Symbols and add them alongside your text. The layout is handled automatically.</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr]">
-              <div className="flex items-center justify-center border-r-4 border-black p-4 md:p-8 bg-[#FFD500]">
-                <span className="text-5xl font-black">3</span>
-              </div>
-              <div className="p-6 md:p-10">
-                <h3 className="text-2xl font-black uppercase md:text-3xl">Export as PDF and use it immediately</h3>
-                <p className="mt-3 text-lg font-medium text-gray-700">One tap creates a print-ready PDF. Print it out, save it to your phone, or send it to their care team. Done in minutes — ready to use today.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            
-              <a
-              href={REGISTER_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-[#FFD500] px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all"
-            >
-              Get Started — £14.99/month <ArrowRight className="ml-3 h-6 w-6 stroke-[3]" />
-            </a>
-            
-              <a
-              href={APP_URL}
-              className="inline-flex items-center justify-center border-4 border-black bg-white px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all gap-2"
-            >
-              <Play className="h-5 w-5" /> Try free first
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="border-b-4 border-black bg-white px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-4xl font-black uppercase md:text-5xl">What carers are saying</h2>
-          <p className="mt-4 text-xl font-medium">From people who use it every week.</p>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {[
-              {
-                quote: "I used to dread explaining hospital appointments to my son. Now I open the appointment template, fill in the details, and he actually looks forward to going. It takes me four minutes.",
-                name: "Sarah M.",
-                role: "Parent of a 24-year-old with Down's syndrome",
-                color: "bg-[#FF90E8]"
-              },
-              {
-                quote: "The medication reminder template changed everything. My mum now takes her tablets without any confusion. I printed it out and stuck it on the fridge. Simple as that.",
-                name: "James T.",
-                role: "Full-time carer for his mother with dementia",
-                color: "bg-[#00E5FF]"
-              },
-              {
-                quote: "I support three clients. Having a library of ready-made guides saves me hours every week. The symbols are exactly right — not clip art, proper accessible symbols.",
-                name: "Denise K.",
-                role: "Personal Assistant, London",
-                color: "bg-[#FFD500]"
-              }
-            ].map((t, i) => (
-              <div key={i} className={`border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${t.color}`}>
-                <StarRating />
-                <p className="mt-4 text-lg font-medium leading-relaxed">"{t.quote}"</p>
-                <div className="mt-6 border-t-4 border-black pt-4">
-                  <p className="font-black">{t.name}</p>
-                  <p className="text-sm font-medium text-gray-700">{t.role}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHAT HAPPENS NEXT */}
-      <section className="border-b-4 border-black bg-[#F4F4F0] px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-4xl font-black uppercase md:text-5xl text-center">What happens when you subscribe</h2>
-          <p className="text-center mt-4 text-xl font-medium">No waiting. No complicated setup. Instant access.</p>
-
-          <div className="mt-12 overflow-hidden border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            {[
-              { step: "1", color: "bg-[#FFD500]", title: "Create your account", desc: "Enter your email and password on the register page — takes 30 seconds." },
-              { step: "2", color: "bg-[#00E5FF]", title: "Pay securely via Stripe", desc: "You're taken to Stripe's secure checkout page. Enter your card details. £14.99 is taken. That's it." },
-              { step: "3", color: "bg-[#FF90E8]", title: "Your account is created instantly", desc: "As soon as payment confirms, your account is active. Sign in and you have access to all 35+ templates immediately." },
-              { step: "4", color: "bg-[#FFD500]", title: "Open your first template", desc: "Browse the library, pick the template you need, add your details, and export your first document — all within minutes." },
-            ].map((item, i) => (
-              <div key={i} className="grid grid-cols-[60px_1fr] border-b-4 border-black last:border-b-0">
-                <div className={`flex items-center justify-center border-r-4 border-black p-4 ${item.color}`}>
-                  <span className="text-2xl font-black">{item.step}</span>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-black uppercase">{item.title}</h3>
-                  <p className="mt-1 font-medium text-gray-700">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center mt-6 font-bold text-gray-600">Cancel anytime from your Stripe account — no phone calls, no forms, one click.</p>
-        </div>
-      </section>
-
-      {/* PRICING */}
-      <section id="pricing" className="border-b-4 border-black bg-white px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center">
-            <h2 className="text-4xl font-black uppercase md:text-5xl">Simple, honest pricing</h2>
-            <p className="mt-4 text-xl font-medium">One plan. All 35+ templates included. Cancel anytime.</p>
-          </div>
-
-          <div className="mt-12 border-4 border-black bg-[#FFD500] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative p-8 md:p-12">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 border-4 border-black bg-black text-white px-6 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(255,213,0,1)] whitespace-nowrap">
-              Everything included
-            </div>
-
-            <div className="text-center mt-4">
-              <div className="flex items-baseline justify-center gap-2">
-                <span className="text-8xl font-black">£14.99</span>
-                <span className="text-2xl font-bold">/ month</span>
-              </div>
-              <p className="mt-2 font-bold uppercase text-gray-700">Less than 50p a day</p>
-            </div>
-
-            <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl overflow-hidden border border-amber-200 shadow-sm mb-6">
+            <div className="bg-amber-400 text-white px-4 py-3 text-xs font-bold uppercase tracking-wider">After — EZ Read Pro Version</div>
+            <div className="bg-white divide-y divide-stone-100">
               {[
-                "All 35+ daily life templates",
-                "3,400+ specialist Mulberry Symbols",
-                "Unlimited document creation",
-                "Instant PDF export and printing",
-                "Works on any phone, tablet or computer",
-                "No personal data ever stored",
-                "Cancel anytime — one click in Stripe",
-                "Email support included",
-              ].map((f, i) => (
-                <div key={i} className="flex items-center gap-3 font-bold">
-                  <CheckSquare className="h-6 w-6 shrink-0" />
-                  {f}
+                { sym: "doctor_1a.svg", text: "You have a doctors appointment." },
+                { sym: "when.svg", text: "When: Tuesday 3rd June at 2:30pm" },
+                { sym: "surgery_health_centre.svg", text: "Where: St Georges Hospital, Level 3, Block C" },
+                { sym: "doctor_1b.svg", text: "You will see: Dr Ahmed" },
+                { sym: "letter.svg", text: "Bring: This letter and your medicines list" },
+                { sym: "when.svg", text: "Arrive 15 minutes early" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                    <img src={`${SYM}${item.sym}?alt=media`} alt="" className="w-8 h-8 object-contain" />
+                  </div>
+                  <p className="text-stone-700 text-sm font-medium">{item.text}</p>
                 </div>
               ))}
             </div>
-
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-              
-                <a
-                href={REGISTER_URL}
-                className="inline-flex items-center justify-center border-4 border-black bg-black text-[#FFD500] px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all"
-              >
-                Get Access Now <ArrowRight className="ml-3 h-6 w-6 stroke-[3]" />
-              </a>
-              
-                <a
-                href={APP_URL}
-                className="inline-flex items-center justify-center border-4 border-black bg-white text-black px-10 py-5 font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all gap-2"
-              >
-                <Play className="h-5 w-5" /> Try free demo first
-              </a>
-            </div>
-
-            <p className="text-center mt-6 font-bold text-sm uppercase text-gray-700">
-              Secure payment via Stripe · Cancel anytime · Instant access
-            </p>
           </div>
-
-          <div className="mt-8 border-l-8 border-black pl-6">
-            <p className="font-bold text-gray-700">
-              Need this for a care home or support team?{' '}
-              <a href="mailto:support@ezread.co.uk" className="underline underline-offset-4 font-black">
-                View organisation plans →
-              </a>
-            </p>
-          </div>
+          <a href={REGISTER_URL} className="w-full bg-amber-400 hover:bg-amber-500 text-white font-bold text-lg py-4 rounded-2xl text-center transition-colors shadow-sm block">
+            Create yours in minutes — £14.99/month
+          </a>
         </div>
       </section>
 
-      {/* TRUST */}
-      <section className="border-b-4 border-black bg-[#F4F4F0] px-6 py-20">
-        <div className="mx-auto max-w-4xl text-center">
-          <ShieldCheck className="mx-auto h-20 w-20 stroke-[2]" />
-          <h2 className="mt-8 text-4xl font-black uppercase md:text-5xl">Built around your privacy</h2>
-          <p className="mt-6 text-xl font-medium max-w-2xl mx-auto">
-            EZ Read Pro never sees, stores or processes any information about the person you care for. Everything stays on your device.
-          </p>
+      <section className="px-5 py-12 bg-white">
+        <div className="max-w-xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-1.5 text-sm font-medium text-amber-700 mb-4">
+            The template library
+          </div>
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">35+ guides already made.</h2>
+          <p className="text-stone-500 mb-8">Open, personalise, use. Every template uses specialist Mulberry Symbols — the same symbols used by speech and language therapists across the UK.</p>
+          <div className="flex flex-col gap-4 mb-8">
+            {templates.map((t, i) => (
+              <SymCard key={i} sym={t.sym} title={t.title} desc={t.desc} />
+            ))}
+          </div>
+          <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-6">
+            <p className="text-stone-700 font-medium text-sm">Plus 26 more templates covering personal hygiene, fire safety, online safety, friendships, relationships, public transport, restaurants, asking for help, saying no and more.</p>
+          </div>
+          <a href={REGISTER_URL} className="w-full bg-amber-400 hover:bg-amber-500 text-white font-bold text-lg py-4 rounded-2xl text-center transition-colors shadow-sm block mb-3">
+            Get Access to All 35+ Templates
+          </a>
+          <a href={APP_URL} className="w-full bg-white hover:bg-stone-50 text-stone-700 font-semibold text-lg py-4 rounded-2xl text-center transition-colors border border-stone-200 shadow-sm block">
+            Try Free Demo First
+          </a>
+        </div>
+      </section>
 
-          <div className="mt-12 grid gap-6 text-left md:grid-cols-2">
+      <section className="px-5 py-12 bg-stone-50">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">How it works</h2>
+          <p className="text-stone-500 mb-8">Three steps. No training needed.</p>
+          <div className="flex flex-col gap-4">
             {[
-              { title: "Zero Data Storage", body: "Documents are created and saved on your own device. Nothing about the person you care for is uploaded to our servers — ever." },
-              { title: "No Personal Information Required", body: "You never enter details about the person you care for. The app doesn't ask for it and doesn't need it." },
-              { title: "Supports the Accessible Information Standard", body: "The AIS gives people with communication needs the legal right to accessible information. EZ Read Pro helps you provide it — at home, not just in clinical settings." },
-              { title: "Specialist Mulberry Symbols", body: "Every symbol in the library is a Mulberry Symbol — the trusted open symbol set used by speech and language therapists and AAC specialists across the UK. Not generic clip art." },
-            ].map((item, i) => (
-              <div key={i} className="border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-                <h4 className="flex items-center text-xl font-black uppercase"><CheckSquare className="mr-3 h-6 w-6 shrink-0" /> {item.title}</h4>
-                <p className="mt-2 font-medium">{item.body}</p>
+              { num: "1", color: "bg-blue-100 text-blue-600", title: "Open a template", body: "Browse 35+ guides by category. Find the one you need in seconds. Daily routines, health, emotions, safety and more." },
+              { num: "2", color: "bg-amber-100 text-amber-600", title: "Add your details and symbols", body: "Type your specific information. Search 3,400+ specialist Mulberry Symbols and add them with one tap." },
+              { num: "3", color: "bg-green-100 text-green-600", title: "Export as PDF and use it", body: "One tap creates a print-ready PDF. Print it, save it to your phone, or share with their care team." },
+            ].map((step, i) => (
+              <div key={i} className="bg-white rounded-2xl p-5 border border-stone-100 shadow-sm flex gap-4 items-start">
+                <div className={`w-10 h-10 rounded-xl ${step.color} flex items-center justify-center font-bold text-lg shrink-0`}>{step.num}</div>
+                <div>
+                  <h3 className="font-bold text-stone-800 text-base mb-1">{step.title}</h3>
+                  <p className="text-stone-500 text-sm leading-relaxed">{step.body}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="border-b-4 border-black bg-white px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-4xl font-black uppercase md:text-5xl mb-12">Questions answered</h2>
-
-          <div className="space-y-4">
+      <section className="px-5 py-12 bg-white">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">What happens when you subscribe</h2>
+          <p className="text-stone-500 mb-8">No waiting. Instant access.</p>
+          <div className="flex flex-col gap-3 mb-6">
             {[
-              { q: "Do I need any design or tech skills?", a: "None at all. If you can send a text message, you can use EZ Read Pro. Open a template, type your details, tap export. That's it — no design experience needed." },
-              { q: "Can I try it before subscribing?", a: "Yes — click Try Free Demo to explore the full template library and editor with no account needed. You'll see exactly what you're getting before you pay a penny." },
-              { q: "What templates are included?", a: "All 35+ daily life templates are included: morning and bedtime routines, medication reminders, appointment guides, emotion charts, safety guides, social situation guides, money basics, relationship guides, and more. All with specialist Mulberry Symbols." },
-              { q: "Is this only for people with learning disabilities?", a: "No. The templates and symbols work for anyone who benefits from clear, visual communication — including people with dementia, acquired brain injuries, low literacy, autism, or anyone who finds standard written information difficult to process." },
-              { q: "What happens to my documents if I cancel?", a: "Because nothing is stored on our servers, there is nothing to lose. Your documents live on your own device. You keep everything you've created." },
-              { q: "How do I cancel if I need to?", a: "Log in to your Stripe customer portal — one click and your subscription is cancelled. No phone calls, no forms, no 30-day notice periods." },
-              { q: "Is my payment secure?", a: "All payments are handled by Stripe, one of the world's most trusted payment processors. We never see or store your card details." },
-              { q: "I'm a support worker or PA — is this right for me?", a: "Yes. The individual plan works well for personal assistants and support workers looking after one or a small number of people. If you work for a larger organisation, email support@ezread.co.uk about team plans." },
+              { emoji: "✏️", title: "Create your account", body: "Enter your email and password. Takes 30 seconds." },
+              { emoji: "🔒", title: "Pay securely via Stripe", body: "Taken to Stripes secure checkout. £14.99 is taken. That is it." },
+              { emoji: "⚡", title: "Instant access", body: "As soon as payment confirms, your account is active. All 35+ templates available immediately." },
+              { emoji: "📄", title: "Open your first template", body: "Browse the library, pick a template, add your details, export. All within minutes." },
+            ].map((step, i) => (
+              <div key={i} className="flex items-start gap-4 bg-stone-50 rounded-2xl p-4 border border-stone-100">
+                <span className="text-2xl">{step.emoji}</span>
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm mb-0.5">{step.title}</h3>
+                  <p className="text-stone-500 text-sm leading-relaxed">{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-stone-500 text-sm">Cancel anytime from your Stripe account — one click, no forms.</p>
+        </div>
+      </section>
+
+      <section className="px-5 py-12 bg-stone-50">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">Simple, honest pricing</h2>
+          <p className="text-stone-500 mb-8">One plan. Everything included.</p>
+          <div className="bg-white rounded-2xl border border-amber-200 shadow-sm overflow-hidden mb-6">
+            <div className="bg-amber-400 px-6 py-5">
+              <p className="text-white font-bold text-sm uppercase tracking-wide">Everything included</p>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-5xl font-bold text-white">£14.99</span>
+                <span className="text-white font-medium">/ month</span>
+              </div>
+              <p className="text-amber-100 text-sm mt-1">Less than 50p a day</p>
+            </div>
+            <div className="p-6 flex flex-col gap-3">
+              {["All 35+ daily life templates","3,400+ specialist Mulberry Symbols","Unlimited document creation","Instant PDF export","Works on any phone, tablet or computer","No personal data ever stored","Cancel anytime — one click in Stripe","Email support included"].map((f, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Tick />
+                  <span className="text-stone-700 text-sm">{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <a href={REGISTER_URL} className="w-full bg-amber-400 hover:bg-amber-500 text-white font-bold text-lg py-4 rounded-2xl text-center transition-colors shadow-sm block mb-3">
+            Get Access Now
+          </a>
+          <a href={APP_URL} className="w-full bg-white hover:bg-stone-50 text-stone-700 font-semibold text-lg py-4 rounded-2xl text-center transition-colors border border-stone-200 shadow-sm block mb-6">
+            Try Free Demo First
+          </a>
+          <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 text-center">
+            <p className="text-stone-600 text-sm">Need this for a care home? <a href="https://carehomes.ezread.co.uk" className="text-amber-600 font-semibold underline">View organisation plans →</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-12 bg-white">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-8 text-center">Built around your privacy</h2>
+          <div className="flex flex-col gap-4">
+            {[
+              { emoji: "🔒", title: "Zero data storage", body: "Documents are created on your own device. Nothing about the person you care for is uploaded to our servers — ever." },
+              { emoji: "👤", title: "No personal information required", body: "You never enter details about the person you care for. The app does not ask for it." },
+              { emoji: "✅", title: "Supports the Accessible Information Standard", body: "EZ Read Pro helps you provide information in a format people can understand — a legal right under the AIS." },
+              { emoji: "🎨", title: "Specialist Mulberry Symbols", body: "Every symbol is a Mulberry Symbol — used by speech and language therapists across the UK. Not generic clip art." },
             ].map((item, i) => (
-              <FAQItem key={i} q={item.q} a={item.a} />
+              <div key={i} className="flex items-start gap-4 bg-stone-50 rounded-2xl p-4 border border-stone-100">
+                <span className="text-2xl">{item.emoji}</span>
+                <div>
+                  <h3 className="font-semibold text-stone-800 text-sm mb-1">{item.title}</h3>
+                  <p className="text-stone-500 text-sm leading-relaxed">{item.body}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="border-b-4 border-black bg-black px-6 py-24 text-center">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-5xl font-black uppercase leading-tight md:text-7xl text-white">
-            The guides are ready.<br/>
-            <span className="text-[#FFD500]">You just need to open them.</span>
-          </h2>
-          <p className="mt-6 text-2xl font-bold text-gray-300">
-            35+ templates. £14.99/month. Instant access. Cancel anytime.
-          </p>
-          <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row">
-            
-              <a
-              href={REGISTER_URL}
-              className="inline-flex items-center justify-center border-4 border-[#FFD500] bg-[#FFD500] text-black px-12 py-6 font-black uppercase tracking-wider text-2xl shadow-[8px_8px_0px_0px_rgba(255,213,0,0.4)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(255,213,0,0.4)] transition-all w-full sm:w-auto"
-            >
-              Get Access Now — £14.99/mo <ArrowRight className="ml-3 h-7 w-7 stroke-[3]" />
-            </a>
-            
-              <a
-              href={APP_URL}
-              className="inline-flex items-center justify-center border-4 border-white bg-transparent text-white px-12 py-6 font-black uppercase tracking-wider text-2xl shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] transition-all w-full sm:w-auto gap-3"
-            >
-              <Play className="h-7 w-7" /> Try Demo Free
-            </a>
+      <section className="px-5 py-12 bg-stone-50">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-900 mb-8">Questions answered</h2>
+          <div className="flex flex-col gap-3">
+            {faqs.map((f, i) => <FAQItem key={i} q={f.q} a={f.a} />)}
           </div>
-          <p className="mt-8 text-gray-500 font-bold uppercase text-sm tracking-wider">
-            No credit card needed for demo · Secure checkout via Stripe · Instant access
-          </p>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-black border-t-4 border-[#FFD500] px-6 py-12 text-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center border-2 border-[#FFD500] bg-[#FFD500]">
-              <FileText className="h-5 w-5 text-black stroke-[3]" />
+      <section className="px-5 py-16 bg-amber-400">
+        <div className="max-w-xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-3 leading-tight">The guides are ready. You just need to open them.</h2>
+          <p className="text-amber-100 text-lg mb-8">35+ templates. £14.99/month. Instant access. Cancel anytime.</p>
+          <a href={REGISTER_URL} className="w-full bg-white hover:bg-stone-50 text-amber-600 font-bold text-lg py-4 rounded-2xl text-center transition-colors shadow-sm block mb-3">
+            Get Access Now — £14.99/mo
+          </a>
+          <a href={APP_URL} className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold text-lg py-4 rounded-2xl text-center transition-colors block">
+            Try Free Demo First
+          </a>
+          <p className="text-amber-200 text-sm mt-6">No credit card needed for demo · Secure checkout via Stripe</p>
+        </div>
+      </section>
+
+      <footer className="bg-stone-800 px-5 py-10 text-stone-400">
+        <div className="max-w-xl mx-auto">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-amber-400 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
-            <span className="text-xl font-black uppercase tracking-tight">EZ Read Pro</span>
+            <span className="font-bold text-white">EZ Read Pro</span>
           </div>
-          <div className="text-sm font-medium text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} EZ Read Pro. All rights reserved.
-            <div className="mt-1 opacity-50">Mulberry Symbols are copyright 2018 to 2026 Steve Lee, licensed under Creative Commons Attribution-ShareAlike</div>
+          <div className="flex flex-wrap gap-5 text-sm mb-6">
+            <a href="https://ezread.co.uk/privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="https://ezread.co.uk/terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="mailto:support@ezread.co.uk" className="hover:text-white transition-colors">Support</a>
+            <a href="https://carehomes.ezread.co.uk" className="hover:text-white transition-colors">Care Homes</a>
           </div>
-          <div className="flex gap-6 text-sm font-bold uppercase">
-            <a href="https://ezread.co.uk/privacy" className="hover:text-[#FFD500]">Privacy</a>
-            <a href="https://ezread.co.uk/terms" className="hover:text-[#FFD500]">Terms</a>
-            <a href="mailto:support@ezread.co.uk" className="hover:text-[#FFD500]">Support</a>
-          </div>
+          <p className="text-xs text-stone-500 leading-relaxed">© 2026 EZ Read Pro. All rights reserved. Mulberry Symbols © 2018–2026 Steve Lee, licensed under Creative Commons Attribution-ShareAlike.</p>
         </div>
       </footer>
+
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-stone-200 px-4 py-3 flex gap-3 shadow-lg sm:hidden">
+        <a href={APP_URL} className="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl text-center text-sm transition-colors">Try Free</a>
+        <a href={REGISTER_URL} className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-center text-sm transition-colors">Get Access — £14.99</a>
+      </div>
+      <div className="h-16 sm:hidden"></div>
 
     </div>
   );
