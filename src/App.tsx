@@ -5,9 +5,20 @@ const APP_URL = "https://app.ezread.co.uk";
 const CAREHOMES_URL = "https://carehomes.ezread.co.uk";
 const EXTENSION_ZIP = "https://app.ezread.co.uk/downloads/ez-read-extension.zip";
 const SUPPORT_EMAIL = "hello@ezread.co.uk";
-const SYM = "https://firebasestorage.googleapis.com/v0/b/ez-read-pro-3761e.firebasestorage.app/o/EN-symbols%2F";
 
 const display = "font-display tracking-tight";
+
+// Mulberry Symbols (CC BY-SA 4.0) copied into public/symbols. Decorative, so alt="".
+const Sym = ({ name, className = "w-12 h-12" }: { name: string; className?: string }) => (
+  <img src={`/symbols/${name}.svg`} alt="" className={`object-contain select-none ${className}`} draggable={false} />
+);
+
+// A symbol sitting in a soft coloured circle.
+const SymBadge = ({ name, tint, size = "w-20 h-20", img = "w-14 h-14", className = "" }: { name: string; tint: string; size?: string; img?: string; className?: string }) => (
+  <span className={`grid place-items-center rounded-full ${tint} ${size} ${className}`} aria-hidden="true">
+    <Sym name={name} className={img} />
+  </span>
+);
 
 const Logo = ({ className = "" }: { className?: string }) => (
   <span className={`inline-flex items-center gap-2.5 ${className}`}>
@@ -101,7 +112,7 @@ function WaitlistForm({ product, cta, dark = false }: { product: WaitlistProduct
 /* Hero illustration: an EZ Browser window guiding a click, with an Easy Read card beside it. */
 function HeroVisual() {
   return (
-    <div className="relative mx-auto w-full max-w-[520px]" aria-hidden="true">
+    <div className="relative mx-auto w-full max-w-[520px] mt-10 lg:mt-0" aria-hidden="true">
       <div className="rounded-2xl bg-ink shadow-2xl shadow-ink/25 overflow-hidden border border-ink">
         <div className="flex items-center gap-2 px-4 py-3 bg-[#1f2230]">
           <span className="w-3 h-3 rounded-full bg-[#ff5f57]" />
@@ -134,11 +145,18 @@ function HeroVisual() {
         </div>
       </div>
 
+      {/* friendly faces */}
+      <div className="absolute -top-16 -left-4 sm:-left-16 rotate-[-6deg] bg-white rounded-3xl shadow-lg border-2 border-ink px-3 py-2 flex items-center gap-2">
+        <Sym name="happy-lady" className="w-12 h-12" />
+        <span className="font-display font-bold text-ink pr-1">“Oh, that's easy!”</span>
+      </div>
+      <SymBadge name="thumbs" tint="bg-ez" size="w-20 h-20" img="w-14 h-14" className="absolute -bottom-14 left-2 sm:-left-12 rotate-[-8deg] shadow-lg border-2 border-ink" />
+
       {/* Easy Read card */}
       <div className="absolute -right-2 sm:-right-8 -bottom-24 sm:-bottom-16 w-52 sm:w-56 rotate-[3deg] rounded-2xl bg-white border-2 border-ink p-4 shadow-xl">
         <p className="text-[11px] font-bold uppercase tracking-wider text-ez-deep mb-2">Easy Read</p>
         <div className="flex items-center gap-3">
-          <img src={`${SYM}doctor_1a.svg?alt=media`} alt="" className="w-12 h-12 object-contain shrink-0" />
+          <Sym name="doctor" className="w-12 h-12 shrink-0" />
           <p className="text-ink font-semibold leading-snug text-sm">You will see the doctor on Monday.</p>
         </div>
       </div>
@@ -166,8 +184,8 @@ const products: Product[] = [
     kind: "Web app",
     blurb: "Turn letters, plans and leaflets into Easy Read, with clear pictures beside every key idea. Ready to print in minutes.",
     points: ["3,400+ Mulberry symbols", "Ready-made templates", "Works on any device, no install"],
-    accent: "bg-ez",
-    icon: <img src={`${SYM}morning.svg?alt=media`} alt="" className="w-9 h-9 object-contain" />,
+    accent: "bg-amber-100",
+    icon: <Sym name="read" className="w-14 h-14" />,
     actions: (
       <>
         <a href={APP_URL} className="inline-flex items-center gap-2 rounded-xl bg-ink text-white font-bold px-5 py-3 hover:bg-plum transition-colors">
@@ -186,12 +204,8 @@ const products: Product[] = [
     kind: "Browser extension",
     blurb: "Make any web page Easy Read with one click: short sentences, everyday words and a picture beside each idea.",
     points: ["One click on any website", "Pictures, or your licensed Makaton signs", "Chrome and Microsoft Edge"],
-    accent: "bg-[#ffe7a3]",
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14 4a2 2 0 10-4 0v1H6a1 1 0 00-1 1v4h1a2 2 0 110 4H5v4a1 1 0 001 1h4v-1a2 2 0 114 0v1h4a1 1 0 001-1v-4h-1a2 2 0 110-4h1V6a1 1 0 00-1-1h-4V4z" />
-      </svg>
-    ),
+    accent: "bg-sky-100",
+    icon: <Sym name="laptop" className="w-14 h-14" />,
     actions: (
       <>
         <a href={EXTENSION_ZIP} download className="inline-flex items-center gap-2 rounded-xl bg-ink text-white font-bold px-5 py-3 hover:bg-plum transition-colors">
@@ -211,14 +225,8 @@ const products: Product[] = [
     kind: "Desktop app · Windows & Mac",
     blurb: "A web browser with a friendly guide built in. Ask for help, and it lights up the exact thing to click next.",
     points: ["Type or say what you want to do", "One glowing step at a time", "Warns you before paying or posting"],
-    accent: "bg-neon",
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <path strokeLinecap="round" d="M3 9h18" />
-        <rect x="8" y="12" width="8" height="4" rx="1" strokeWidth={2.5} />
-      </svg>
-    ),
+    accent: "bg-emerald-100",
+    icon: <Sym name="point" className="w-14 h-14" />,
     actions: (
       <a href="#ez-browser-detail" className="inline-flex items-center gap-2 rounded-xl bg-ink text-white font-bold px-5 py-3 hover:bg-plum transition-colors">
         Join the waitlist <Arrow />
@@ -235,9 +243,9 @@ const statusStyle: Record<Product["status"], string> = {
 
 function ProductCard({ p }: { p: Product }) {
   return (
-    <article id={p.id} className="scroll-mt-24 flex flex-col rounded-3xl bg-white border-2 border-line hover:border-ink transition-colors p-6 sm:p-7">
+    <article id={p.id} className="scroll-mt-24 flex flex-col rounded-[2rem] bg-white border-2 border-line hover:border-ink hover:-translate-y-1 transition-all p-6 sm:p-7">
       <div className="flex items-start justify-between gap-3 mb-5">
-        <div className={`grid place-items-center w-14 h-14 rounded-2xl ${p.accent} text-ink`}>{p.icon}</div>
+        <div className={`grid place-items-center w-20 h-20 rounded-full ${p.accent}`} aria-hidden="true">{p.icon}</div>
         <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusStyle[p.status]}`}>{p.status}</span>
       </div>
       <p className="text-sm font-semibold text-ink-soft">{p.kind}</p>
@@ -253,20 +261,27 @@ function ProductCard({ p }: { p: Product }) {
   );
 }
 
+const audiences = [
+  { sym: "older-lady", tint: "bg-amber-100", title: "Grandparents getting online", body: "Video calls, emails and online shopping, without the panic." },
+  { sym: "happy-man", tint: "bg-sky-100", title: "People who like things simple", body: "Pictures and plain words, for learning disabilities, autism and more." },
+  { sym: "family", tint: "bg-rose-100", title: "Families", body: "Help your loved ones do more on their own, even when you're not there." },
+  { sym: "carer", tint: "bg-emerald-100", title: "Carers and support teams", body: "Easy Read letters and guides in minutes, not hours." },
+];
+
 const promises = [
-  { title: "Plain words", body: "No jargon. Every button says what it does, and every instruction is one short step." },
-  { title: "Big and clear", body: "Large text, strong contrast and generous buttons, so nothing is fiddly or hard to see." },
-  { title: "No training needed", body: "If you can send a text message, you can use EZ software. Open it and go." },
-  { title: "Private by design", body: "We keep as little data as we can. EZ Browser turns your voice into text on your own computer." },
+  { sym: "talk", tint: "bg-amber-100", title: "Plain words", body: "No jargon. Every button says what it does, and every instruction is one short step." },
+  { sym: "glasses", tint: "bg-sky-100", title: "Big and clear", body: "Large text, strong contrast and generous buttons, so nothing is fiddly or hard to see." },
+  { sym: "thumbs", tint: "bg-emerald-100", title: "No training needed", body: "If you can send a text message, you can use EZ software. Open it and go." },
+  { sym: "key", tint: "bg-violet-100", title: "Private by design", body: "We keep as little data as we can. EZ Browser turns your voice into text on your own computer." },
 ];
 
 const browserFeatures = [
-  { title: "Ask in your own words", body: "Press Help me, then type or say what you want, like “How do I upload a video?”" },
-  { title: "It shows you where", body: "The screen dims and a glowing box appears around the one thing to click next." },
-  { title: "Wrong clicks are caught", body: "Clicks outside the glowing box are stopped, so you can't end up somewhere unexpected." },
-  { title: "Read aloud", body: "Each step can be spoken out loud, and repeated as many times as you like." },
-  { title: "Safety first", body: "It warns you before you pay, post or delete, flags pages that look like scams, and never asks for passwords." },
-  { title: "Set up by someone you trust", body: "A family member or support worker can set it up once. Big buttons and a simple home page do the rest." },
+  { sym: "talk", title: "Ask in your own words", body: "Press Help me, then type or say what you want, like “How do I upload a video?”" },
+  { sym: "point", title: "It shows you where", body: "The screen dims and a glowing box appears around the one thing to click next." },
+  { sym: "mouse", title: "Wrong clicks are caught", body: "Clicks outside the glowing box are stopped, so you can't end up somewhere unexpected." },
+  { sym: "loud", title: "Read aloud", body: "Each step can be spoken out loud, and repeated as many times as you like." },
+  { sym: "warning", title: "Safety first", body: "It warns you before you pay, post or delete, flags pages that look like scams, and never asks for passwords." },
+  { sym: "hold-hands", title: "Set up by someone you trust", body: "A family member or support worker can set it up once. Big buttons and a simple home page do the rest." },
 ];
 
 export default function App() {
@@ -317,12 +332,16 @@ export default function App() {
       <main id="main">
         {/* Hero */}
         <section id="top" className="relative overflow-hidden">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-24 sm:pt-20 sm:pb-28 grid lg:grid-cols-[1.05fr_1fr] gap-16 lg:gap-10 items-center">
+          <div className="pointer-events-none absolute -top-32 -right-24 w-[520px] h-[520px] rounded-full bg-ez/25 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute top-10 -left-40 w-[380px] h-[380px] rounded-full bg-neon/10 blur-3xl" aria-hidden="true" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pt-14 pb-40 sm:pt-20 sm:pb-32 grid lg:grid-cols-[1.05fr_1fr] gap-16 lg:gap-10 items-center">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full bg-white border-2 border-line px-4 py-1.5 text-sm font-semibold mb-6">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
-                New: EZ Browser is coming soon
-              </p>
+              <div className="flex items-center gap-3 mb-6">
+                <SymBadge name="hello" tint="bg-white border-2 border-line" size="w-16 h-16" img="w-12 h-12" />
+                <p className="relative rounded-2xl rounded-bl-sm bg-white border-2 border-line px-4 py-2 font-semibold">
+                  Hello! <span className="text-ink-soft font-normal">EZ Browser is coming soon.</span>
+                </p>
+              </div>
               <h1 className={`${display} text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[0.98] mb-6`}>
                 Technology,<br />
                 made <span className="relative inline-block">
@@ -331,7 +350,7 @@ export default function App() {
                 </span>
               </h1>
               <p className="text-xl sm:text-2xl text-ink-soft leading-relaxed max-w-xl mb-9">
-                Simple, friendly software for people who find technology hard, and for the families, carers and teams who support them.
+                Friendly software for anyone who finds technology tricky, and for the families, carers and teams who help them. No jargon, no stress, just one easy step at a time.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a href="#software" className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink text-white font-bold text-lg px-7 py-4 hover:bg-plum transition-colors">
@@ -343,6 +362,22 @@ export default function App() {
               </div>
             </div>
             <HeroVisual />
+          </div>
+        </section>
+
+        {/* Who it's for */}
+        <section aria-labelledby="who-heading" className="relative">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+            <h2 id="who-heading" className={`${display} text-3xl sm:text-4xl font-bold text-center mb-10`}>Made for people like…</h2>
+            <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {audiences.map((a) => (
+                <li key={a.title} className="flex flex-col items-center text-center rounded-[2rem] bg-white border-2 border-line p-5 sm:p-6">
+                  <SymBadge name={a.sym} tint={a.tint} size="w-24 h-24 sm:w-28 sm:h-28" img="w-16 h-16 sm:w-20 sm:h-20" className="mb-4" />
+                  <h3 className="font-display font-bold text-lg leading-tight mb-1">{a.title}</h3>
+                  <p className="text-sm text-ink-soft leading-relaxed">{a.body}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -359,9 +394,12 @@ export default function App() {
             </div>
 
             <div className="mt-6 rounded-3xl border-2 border-dashed border-line p-6 sm:p-8 grid md:grid-cols-[1fr_1.1fr] gap-6 items-center">
-              <div>
+              <div className="flex items-start gap-4">
+                <SymBadge name="lightbulb" tint="bg-amber-100" size="w-16 h-16 shrink-0" img="w-11 h-11" />
+                <div>
                 <h3 className={`${display} text-2xl font-bold mb-2`}>More EZ software is on the way</h3>
                 <p className="text-ink-soft leading-relaxed">We're building more tools in the same spirit. Leave your email and we'll tell you when something new launches.</p>
+                </div>
               </div>
               <WaitlistForm product="ez-updates" cta="Keep me posted" />
             </div>
@@ -388,9 +426,9 @@ export default function App() {
                 </div>
               </div>
               <ul className="grid sm:grid-cols-2 gap-4">
-                {browserFeatures.map((f, i) => (
+                {browserFeatures.map((f) => (
                   <li key={f.title} className="rounded-2xl bg-white/[0.04] border border-white/10 p-6">
-                    <span className="grid place-items-center w-9 h-9 rounded-lg bg-neon/15 text-neon font-display font-bold mb-4" aria-hidden="true">{i + 1}</span>
+                    <SymBadge name={f.sym} tint="bg-white" size="w-16 h-16" img="w-11 h-11" className="mb-4 ring-4 ring-neon/30" />
                     <h3 className="font-bold text-lg mb-1.5">{f.title}</h3>
                     <p className="text-white/70 leading-relaxed">{f.body}</p>
                   </li>
@@ -409,7 +447,8 @@ export default function App() {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {promises.map((p) => (
-                <div key={p.title} className="border-t-4 border-ink pt-5">
+                <div key={p.title} className="rounded-[2rem] bg-white border-2 border-line p-6">
+                  <SymBadge name={p.sym} tint={p.tint} size="w-16 h-16" img="w-11 h-11" className="mb-4" />
                   <h3 className={`${display} text-xl font-bold mb-2`}>{p.title}</h3>
                   <p className="text-ink-soft leading-relaxed">{p.body}</p>
                 </div>
@@ -421,9 +460,12 @@ export default function App() {
         {/* Contact band */}
         <section className="px-4 sm:px-6 pb-20">
           <div className="max-w-6xl mx-auto rounded-3xl bg-ez p-8 sm:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
+            <div className="flex items-center gap-5">
+              <SymBadge name="ask" tint="bg-white" size="w-20 h-20 shrink-0" img="w-14 h-14" className="hidden sm:grid" />
+              <div>
               <h2 className={`${display} text-3xl sm:text-4xl font-bold mb-2`}>Questions? Just ask.</h2>
-              <p className="text-lg text-ink/80">For organisations, partnerships or help with any EZ product.</p>
+              <p className="text-lg text-ink/80">We're real people and we're happy to help, whether you're a family, a carer or an organisation.</p>
+              </div>
             </div>
             <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink text-white font-bold text-lg px-7 py-4 hover:bg-plum transition-colors shrink-0">
               {SUPPORT_EMAIL}
@@ -437,6 +479,10 @@ export default function App() {
           <div>
             <Logo />
             <p className="text-sm text-ink-soft mt-3">© {new Date().getFullYear()} Novare Enterprises. Technology, made EZ.</p>
+            <p className="text-xs text-ink-soft mt-1">
+              Pictures: <a href="https://mulberrysymbols.org" className="underline hover:text-ink">Mulberry Symbols</a> © Garry Paxton, Steve Lee,{" "}
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline hover:text-ink">CC BY-SA 4.0</a>
+            </p>
           </div>
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-ink-soft">
             <li><a href={APP_URL} className="hover:text-ink">EZ Read Pro</a></li>
