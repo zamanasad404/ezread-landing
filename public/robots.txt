@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ezread.novare-pwa.co.uk/sitemap.xml
+Sitemap: https://ezread.co.uk/sitemap.xml

@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+
+  --color-ink: #14161f;
+  --color-ink-soft: #4a4f5e;
+  --color-paper: #fbf8f1;
+  --color-line: #e7e1d3;
+  --color-ez: #ffc93c;
+  --color-ez-deep: #b07d00;
+  --color-neon: #3dffa2;
+  --color-plum: #5b3df5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--color-neon), 0 0 18px 4px rgb(61 255 162 / 0.55); }
+  50% { box-shadow: 0 0 0 3px var(--color-neon), 0 0 30px 10px rgb(61 255 162 / 0.8); }
+}
+
+@keyframes nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.neon-ring {
+  animation: neon-pulse 2.2s ease-in-out infinite;
+}
+
+.nudge {
+  animation: nudge 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .neon-ring, .nudge { animation: none; }
+  .neon-ring { box-shadow: 0 0 0 3px var(--color-neon), 0 0 22px 6px rgb(61 255 162 / 0.6); }
+}
