@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { isValidEmail, joinWaitlist, type WaitlistProduct } from "./waitlist";
 
 const APP_URL = "https://app.ezread.co.uk";
-const CAREHOMES_URL = "https://carehomes.ezread.co.uk";
 const EXTENSION_ZIP = "https://app.ezread.co.uk/downloads/ez-read-extension.zip";
 const SUPPORT_EMAIL = "hello@ezread.co.uk";
 
@@ -167,8 +166,9 @@ function HeroVisual() {
 type Product = {
   id: string;
   name: string;
-  status: "Available now" | "Free download" | "Coming soon";
+  status: "Available now" | "Coming soon";
   kind: string;
+  price?: string;
   blurb: string;
   points: string[];
   accent: string;
@@ -182,6 +182,7 @@ const products: Product[] = [
     name: "EZ Read Pro",
     status: "Available now",
     kind: "Web app",
+    price: "From £10",
     blurb: "Turn letters, plans and leaflets into Easy Read, with clear pictures beside every key idea. Ready to print in minutes.",
     points: ["3,400+ Mulberry symbols", "Ready-made templates", "Works on any device, no install"],
     accent: "bg-amber-100",
@@ -191,8 +192,8 @@ const products: Product[] = [
         <a href={APP_URL} className="inline-flex items-center gap-2 rounded-xl bg-ink text-white font-bold px-5 py-3 hover:bg-plum transition-colors">
           Open EZ Read Pro <Arrow />
         </a>
-        <a href={CAREHOMES_URL} className="inline-flex items-center gap-2 font-semibold text-ink underline underline-offset-4 decoration-2 decoration-ez hover:decoration-ink px-1 py-3">
-          For care homes
+        <a href="#pricing" className="inline-flex items-center gap-2 font-semibold text-ink underline underline-offset-4 decoration-2 decoration-ez hover:decoration-ink px-1 py-3">
+          See prices
         </a>
       </>
     ),
@@ -200,8 +201,9 @@ const products: Product[] = [
   {
     id: "ez-read-extension",
     name: "EZ Read for Chrome & Edge",
-    status: "Free download",
+    status: "Available now",
     kind: "Browser extension",
+    price: "£30",
     blurb: "Make any web page Easy Read with one click: short sentences, everyday words and a picture beside each idea.",
     points: ["One click on any website", "Pictures, or your licensed Makaton signs", "Chrome and Microsoft Edge"],
     accent: "bg-sky-100",
@@ -209,7 +211,7 @@ const products: Product[] = [
     actions: (
       <>
         <a href={EXTENSION_ZIP} download className="inline-flex items-center gap-2 rounded-xl bg-ink text-white font-bold px-5 py-3 hover:bg-plum transition-colors">
-          Download free
+          Download
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14" /></svg>
         </a>
         <a href={APP_URL} className="inline-flex items-center gap-2 font-semibold text-ink underline underline-offset-4 decoration-2 decoration-ez hover:decoration-ink px-1 py-3">
@@ -237,7 +239,6 @@ const products: Product[] = [
 
 const statusStyle: Record<Product["status"], string> = {
   "Available now": "bg-emerald-100 text-emerald-900",
-  "Free download": "bg-sky-100 text-sky-900",
   "Coming soon": "bg-violet-100 text-violet-900",
 };
 
@@ -250,6 +251,9 @@ function ProductCard({ p }: { p: Product }) {
       </div>
       <p className="text-sm font-semibold text-ink-soft">{p.kind}</p>
       <h3 className={`${display} text-2xl font-bold mt-1 mb-3`}>{p.name}</h3>
+      {p.price && (
+        <p className="mb-3"><span className={`${display} text-3xl font-extrabold`}>{p.price}</span> <span className="text-ink-soft font-semibold">a month</span></p>
+      )}
       <p className="text-ink-soft leading-relaxed mb-5">{p.blurb}</p>
       <ul className="space-y-2 mb-7">
         {p.points.map((pt) => (
@@ -260,6 +264,57 @@ function ProductCard({ p }: { p: Product }) {
     </article>
   );
 }
+
+const plans = [
+  {
+    name: "Family carers",
+    sym: "family",
+    tint: "bg-rose-100",
+    price: "£10",
+    blurb: "EZ Read Pro for looking after someone at home.",
+    points: ["30 everyday templates: routines, feelings, money, safety", "Cards, timetables, signs and communication passports", "3,400+ Mulberry symbols"],
+    note: "Does not include the clinical templates and tools.",
+    cta: "Start as a family carer",
+    href: `${APP_URL}/?register=individual`,
+    best: false,
+  },
+  {
+    name: "Healthcare",
+    sym: "doctor",
+    tint: "bg-amber-100",
+    price: "£25",
+    blurb: "EZ Read Pro for care homes, clinics and support teams.",
+    points: ["Everything in Family carers", "Clinical templates: hospital passports, clinic and discharge letters, care plans", "Communication needs assessments and audit dashboard"],
+    note: "",
+    cta: "Open EZ Read Pro",
+    href: APP_URL,
+    best: false,
+  },
+  {
+    name: "Healthcare + extension",
+    sym: "star",
+    tint: "bg-emerald-100",
+    price: "£50",
+    blurb: "EZ Read Pro Healthcare and the browser extension together.",
+    points: ["All of EZ Read Pro Healthcare", "The Chrome & Edge extension", "£5 less than buying both"],
+    note: "",
+    cta: "Get the bundle",
+    href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("EZ Read bundle (£50 a month)")}`,
+    best: true,
+  },
+  {
+    name: "EZ Read for Chrome & Edge",
+    sym: "laptop",
+    tint: "bg-sky-100",
+    price: "£30",
+    blurb: "Make any web page Easy Read with one click.",
+    points: ["Works on any website", "Pictures beside each idea", "Chrome and Microsoft Edge"],
+    note: "",
+    cta: "Download",
+    href: EXTENSION_ZIP,
+    best: false,
+  },
+];
 
 const audiences = [
   { sym: "older-lady", tint: "bg-amber-100", title: "Grandparents getting online", body: "Video calls, emails and online shopping, without the panic." },
@@ -288,6 +343,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const nav = [
     { href: "#software", label: "Our software" },
+    { href: "#pricing", label: "Pricing" },
     { href: "#ez-browser-detail", label: "EZ Browser" },
     { href: "#promise", label: "The EZ promise" },
   ];
@@ -406,6 +462,48 @@ export default function App() {
           </div>
         </section>
 
+        {/* Pricing */}
+        <section id="pricing" className="scroll-mt-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24">
+            <div className="max-w-2xl mb-12">
+              <p className="font-bold text-ez-deep uppercase tracking-wider text-sm mb-3">Pricing</p>
+              <h2 className={`${display} text-4xl sm:text-5xl font-bold leading-tight mb-4`}>Simple monthly prices.</h2>
+              <p className="text-lg text-ink-soft leading-relaxed">Family carers pay less. Healthcare teams get the clinical templates and tools, and can add the extension for £5 less.</p>
+            </div>
+            <ul className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+              {plans.map((plan) => (
+                <li
+                  key={plan.name}
+                  className={`relative flex flex-col rounded-[2rem] p-6 sm:p-7 border-2 ${plan.best ? "bg-ink text-white border-ink md:-translate-y-2" : "bg-white border-line"}`}
+                >
+                  {plan.best && (
+                    <span className="absolute -top-3 left-6 rounded-full bg-neon text-ink text-xs font-bold px-3 py-1">Best value · save £5</span>
+                  )}
+                  <SymBadge name={plan.sym} tint={plan.best ? "bg-white" : plan.tint} size="w-16 h-16" img="w-11 h-11" className="mb-4" />
+                  <h3 className={`${display} text-2xl font-bold mb-1`}>{plan.name}</h3>
+                  <p className={`mb-5 ${plan.best ? "text-white/70" : "text-ink-soft"}`}>{plan.blurb}</p>
+                  <p className="mb-6">
+                    <span className={`${display} text-5xl font-extrabold`}>{plan.price}</span>{" "}
+                    <span className={`font-semibold ${plan.best ? "text-white/70" : "text-ink-soft"}`}>a month</span>
+                  </p>
+                  <ul className={`space-y-2 ${plan.note ? "mb-4" : "mb-8"}`}>
+                    {plan.points.map((pt) => (
+                      <li key={pt} className="flex items-start gap-2"><Check /><span>{pt}</span></li>
+                    ))}
+                  </ul>
+                  {plan.note && <p className="text-sm text-ink-soft mb-8">{plan.note}</p>}
+                  <a
+                    href={plan.href}
+                    className={`mt-auto inline-flex items-center justify-center gap-2 rounded-xl font-bold px-5 py-3.5 transition-colors ${plan.best ? "bg-neon text-ink hover:bg-white" : "bg-ink text-white hover:bg-plum"}`}
+                  >
+                    {plan.cta} <Arrow />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         {/* EZ Browser spotlight */}
         <section id="ez-browser-detail" className="scroll-mt-20 bg-ink text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24">
@@ -488,7 +586,7 @@ export default function App() {
             <li><a href={APP_URL} className="hover:text-ink">EZ Read Pro</a></li>
             <li><a href={EXTENSION_ZIP} className="hover:text-ink">EZ Read extension</a></li>
             <li><a href="#ez-browser-detail" className="hover:text-ink">EZ Browser</a></li>
-            <li><a href={CAREHOMES_URL} className="hover:text-ink">For care homes</a></li>
+            <li><a href="#pricing" className="hover:text-ink">Pricing</a></li>
             <li><a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">Contact</a></li>
           </ul>
         </div>
