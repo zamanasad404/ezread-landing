@@ -346,6 +346,7 @@ export default function App() {
     { href: "#pricing", label: "Pricing" },
     { href: "#ez-browser-detail", label: "EZ Browser" },
     { href: "#promise", label: "The EZ promise" },
+    { href: "#about", label: "About" },
   ];
 
   return (
@@ -555,8 +556,38 @@ export default function App() {
           </div>
         </section>
 
+        {/* About the founder */}
+        <section id="about" className="scroll-mt-20 bg-white border-y border-line">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24 grid lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-16 items-start">
+            <div>
+              <p className="font-bold text-ez-deep uppercase tracking-wider text-sm mb-3">About EZ</p>
+              <h2 className={`${display} text-4xl sm:text-5xl font-bold leading-tight mb-6`}>Made by someone who's done the job.</h2>
+              <div className="flex items-center gap-4">
+                <SymBadge name="doctor" tint="bg-sky-100" size="w-20 h-20 shrink-0" img="w-14 h-14" />
+                <SymBadge name="hold-hands" tint="bg-emerald-100" size="w-20 h-20 shrink-0" img="w-14 h-14" />
+                <SymBadge name="heart" tint="bg-rose-100" size="w-20 h-20 shrink-0" img="w-14 h-14" />
+              </div>
+            </div>
+            <div className="space-y-5 text-lg text-ink-soft leading-relaxed">
+              <p>
+                <strong className="text-ink">EZ was started by a healthcare professional who has worked in a learning disability healthcare team for many years.</strong>
+              </p>
+              <p>
+                That work has been alongside a multidisciplinary team (MDT) of other professionals, supporting people with learning disabilities, their families and carers every day.
+              </p>
+              <p>
+                It showed how often good information gets lost because it isn't accessible. Easy Read letters and guides take hours to make by hand, and everyday technology can leave people out. EZ software is built to fix that, using what works in real practice.
+              </p>
+              <p>
+                Want to talk about how EZ could help you or your team? Email{" "}
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="font-bold text-ink underline underline-offset-4 hover:text-plum">{SUPPORT_EMAIL}</a>.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Contact band */}
-        <section className="px-4 sm:px-6 pb-20">
+        <section className="px-4 sm:px-6 py-20">
           <div className="max-w-6xl mx-auto rounded-3xl bg-ez p-8 sm:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <SymBadge name="ask" tint="bg-white" size="w-20 h-20 shrink-0" img="w-14 h-14" className="hidden sm:grid" />
@@ -587,7 +618,7 @@ export default function App() {
             <li><a href={EXTENSION_ZIP} className="hover:text-ink">EZ Read extension</a></li>
             <li><a href="#ez-browser-detail" className="hover:text-ink">EZ Browser</a></li>
             <li><a href="#pricing" className="hover:text-ink">Pricing</a></li>
-            <li><a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">Contact</a></li>
+            <li><a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">Contact: {SUPPORT_EMAIL}</a></li>
           </ul>
         </div>
       </footer>
